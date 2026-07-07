@@ -83,7 +83,7 @@ customtkinter.set_appearance_mode("system")
 customtkinter.set_default_color_theme("blue")
 
 app = customtkinter.CTk()
-app.geometry(f"{int(app.winfo_screenwidth() / 2)}x{int(app.winfo_screenheight() / 2)}")
+app.geometry(f"{int(app.winfo_screenwidth() / 3)}x{int(app.winfo_screenheight() / 3)}")
 app.title("YT Downloader")
 app.resizable(False, False)
 
@@ -185,7 +185,7 @@ download_btn = customtkinter.CTkButton(
     text="DOWNLOAD",
     command=download_vid
 )
-download_btn.pack(pady=20)
+download_btn.pack(0)
 
 # =========================
 # RUN APP
