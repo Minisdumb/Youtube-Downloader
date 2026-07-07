@@ -4,21 +4,76 @@ import json
 import os
 import customtkinter
 from yt_dlp import YoutubeDL
+import zipfile
+import urllib.request
+import shutil
+import sys
+
+
+FFMPEG_DIR = os.path.join(
+    os.path.dirname(sys.executable if getattr(sys, "frozen", False) else __file__),
+    "ffmpeg"
+)
+
+
+def install_ffmpeg():
+
+    ffmpeg_exe = os.path.join(FFMPEG_DIR, "bin", "ffmpeg.exe")
+
+    if os.path.exists(ffmpeg_exe):
+        return os.path.join(FFMPEG_DIR,"bin")
+
+
+    print("Installing FFmpeg... Please wait, This may take a minute.")
+
+    url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
+
+    zip_path = "ffmpeg.zip"
+
+    urllib.request.urlretrieve(url, zip_path)
+
+
+    with zipfile.ZipFile(zip_path, "r") as zip_ref:
+        zip_ref.extractall("temp_ffmpeg")
+
+
+    # Find the actual folder containing bin/ffmpeg.exe
+    ffmpeg_root = None
+
+    for root, dirs, files in os.walk("temp_ffmpeg"):
+        if "ffmpeg.exe" in files:
+            ffmpeg_root = root.replace("\\bin", "")
+            break
+
+    if ffmpeg_root is None:
+        raise Exception("Could not find ffmpeg.exe after extraction")
+
+
+    # Create final FFmpeg directory
+    os.makedirs(FFMPEG_DIR, exist_ok=True)
+
+
+    # Copy the whole FFmpeg folder contents
+    for item in os.listdir(ffmpeg_root):
+        source = os.path.join(ffmpeg_root, item)
+        destination = os.path.join(FFMPEG_DIR, item)
+
+        if os.path.isdir(source):
+            shutil.copytree(source, destination, dirs_exist_ok=True)
+        else:
+            shutil.copy2(source, destination)
+
+    os.remove(zip_path)
+    shutil.rmtree("temp_ffmpeg")
+
+    print(FFMPEG_DIR)
+    return os.path.join(FFMPEG_DIR,"bin")
 
 # =========================
 # LOAD CONFIG
 # =========================
 
-CONFIG_FILE = "config.json"
-
-if os.path.exists(CONFIG_FILE):
-    with open(CONFIG_FILE, "r") as f:
-        config = json.load(f)
-else:
-    config = {}
-
-FFMPEG_PATH = config.get("ffmpeg_path")
-NODE_PATH = config.get("node_path")
+FFMPEG_PATH = install_ffmpeg()
 
 # =========================
 # GUI SETUP
@@ -101,16 +156,11 @@ def download_vid():
 
             # FFmpeg config (required for merging)
             if FFMPEG_PATH:
+                print(FFMPEG_PATH + " is the path")
                 ydl_opts["ffmpeg_location"] = FFMPEG_PATH
 
-            # Node.js runtime (optional, for new yt-dlp YouTube JS extraction)
-            if NODE_PATH:
-                ydl_opts["js_runtimes"] = {
-                    "node": NODE_PATH
-                }
-
             with YoutubeDL(ydl_opts) as ydl:
-                ydl.params["ffmpeg_location"] = r"C:/ffmpeg/bin"
+                ydl.params["ffmpeg_location"] = FFMPEG_PATH
                 info = ydl.extract_info(ytlink, download=True)
 
             ui_update(lambda: finished.configure(
