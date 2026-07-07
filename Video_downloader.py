@@ -185,7 +185,7 @@ download_btn = customtkinter.CTkButton(
     text="DOWNLOAD",
     command=download_vid
 )
-download_btn.pack(0)
+download_btn.pack()
 
 # =========================
 # RUN APP
