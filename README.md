@@ -8,4 +8,8 @@ You require [ffmpeg](https://www.ffmpeg.org/) and [Node.js](https://nodejs.org/e
 
 
 # IMPORTANT NOTICE
-If the program seams to not work or doesn't start, give it some time. In the background it is installing a libary called [ffmpeg](https://www.ffmpeg.org/). This is used to merge multiple downloaded parts of the video and merge them together. For this program it is required to install this(which is done automaticly in the background).
+If the program seams to not work or doesn't start, give it some time. In the background it is installing a libary called [ffmpeg](https://www.ffmpeg.org/). 
+
+This is used to merge multiple downloaded parts of the video and merge them together. 
+
+For this program it is **required** to install this(which is done automaticly in the background).
